@@ -28,22 +28,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $email = null;
+    protected ?string $email = null;
 
     #[ORM\Column]
-    private array $roles = [];
+    protected array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-    private ?string $password = null;
+    protected ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $firstname = null;
+    protected ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $lastname = null;
+    protected ?string $lastname = null;
 
     public function getId(): ?int
     {
