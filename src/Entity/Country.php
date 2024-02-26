@@ -20,26 +20,31 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
 #[ApiResource(
+    normalizationContext: ['groups' => ['country:item']],
     operations:[
-        new Get(normalizationContext: ['groups' => ['country:item']]),
-        new GetCollection(normalizationContext: ['groups' => ['country:list']]),
-        new Delete(normalizationContext: ['groups' => ['country:delete']]),
-        new Post(normalizationContext: ['groups' => ['country:create']]),
-        new Patch(normalizationContext: ['groups' => ['country:modify']]),
-
+        new Get(),
+        new GetCollection(),
+        new Delete(),
+        new Post(),
+        new Patch(),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial'])]
 class Country
 {
     #[ORM\Id]
-    #[ORM\Column(length:3)]
-    #[Groups('country:item', 'country:list', 'country:delete', 'country:create', 'country:modify')]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['country:item','city:item'])]
+    private ?int $id = null;
+
+    #[ORM\Column(length:3, unique:true)]
+    #[Groups(['country:item'],['city:item'])]
     private ?string $code = null;
 
 
     #[ORM\Column(length: 255, unique:true)]
-    #[Groups('country:item', 'country:list', 'country:delete', 'country:create', 'country:modify')]
+    #[Groups(['country:item'],['city:item'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'country', targetEntity: City::class, orphanRemoval: true)]
@@ -104,4 +109,7 @@ class Country
 
         return $this;
     }
+
+    public function getId(): ?int { return $this->id; }
+
 }

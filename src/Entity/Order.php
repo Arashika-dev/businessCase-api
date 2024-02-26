@@ -2,6 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
+#[ApiResource]
 class Order
 {
     #[ORM\Id]
@@ -22,9 +31,6 @@ class Order
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $recuperation_hour = null;
-
-    #[ORM\ManyToOne(inversedBy: 'orders_staff')]
-    private ?User $staff = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders_customer')]
     #[ORM\JoinColumn(nullable: false)]
@@ -40,6 +46,9 @@ class Order
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
+
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    private ?Staff $affectedStaff = null;
 
     public function __construct()
     {
@@ -71,18 +80,6 @@ class Order
     public function setRecuperationHour(?\DateTimeInterface $recuperation_hour): static
     {
         $this->recuperation_hour = $recuperation_hour;
-
-        return $this;
-    }
-
-    public function getStaff(): ?User
-    {
-        return $this->staff;
-    }
-
-    public function setStaff(?User $staff): static
-    {
-        $this->staff = $staff;
 
         return $this;
     }
@@ -143,6 +140,18 @@ class Order
     public function setStatus(?Status $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getAffectedStaff(): ?Staff
+    {
+        return $this->affectedStaff;
+    }
+
+    public function setAffectedStaff(?Staff $affectedStaff): static
+    {
+        $this->affectedStaff = $affectedStaff;
 
         return $this;
     }

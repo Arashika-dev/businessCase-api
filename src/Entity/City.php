@@ -2,30 +2,51 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
 use App\Repository\CityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext:['groups' => ['city:item' ]],
+    operations:[
+        new Get(),
+        new GetCollection(),
+        new Delete(),
+        new Post(),
+        new Patch(),
+    ]
+)]
 class City
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['city:item'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['city:item'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['city:item'])]
     private ?string $zipCode = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?country $country = null;
+    #[Groups(['city:item'])]
+    private ?Country $country = null;
 
     #[ORM\OneToMany(mappedBy: 'city', targetEntity: Customer::class)]
     private Collection $customers;

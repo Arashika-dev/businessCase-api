@@ -2,6 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[ApiResource]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -35,14 +44,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastname = null;
-
-    #[ORM\OneToMany(mappedBy: 'staff', targetEntity: Order::class)]
-    private Collection $orders_staff;
-
-    public function __construct()
-    {
-        $this->orders_staff = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -134,36 +135,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastname(?string $lastname): static
     {
         $this->lastname = $lastname;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Order>
-     */
-    public function getOrdersStaff(): Collection
-    {
-        return $this->orders_staff;
-    }
-
-    public function addOrdersStaff(Order $ordersStaff): static
-    {
-        if (!$this->orders_staff->contains($ordersStaff)) {
-            $this->orders_staff->add($ordersStaff);
-            $ordersStaff->setStaff($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOrdersStaff(Order $ordersStaff): static
-    {
-        if ($this->orders_staff->removeElement($ordersStaff)) {
-            // set the owning side to null (unless already changed)
-            if ($ordersStaff->getStaff() === $this) {
-                $ordersStaff->setStaff(null);
-            }
-        }
 
         return $this;
     }

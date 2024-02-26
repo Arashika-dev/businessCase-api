@@ -2,32 +2,21 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Post;
-use App\Repository\StatusRepository;
+use App\Repository\StaffRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: StatusRepository::class)]
+#[ORM\Entity(repositoryClass: StaffRepository::class)]
 #[ApiResource]
-class Status
+class Staff extends User
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $staffNumber = null;
 
-    #[ORM\OneToMany(mappedBy: 'status', targetEntity: Order::class)]
+    #[ORM\OneToMany(mappedBy: 'affectedStaff', targetEntity: Order::class)]
     private Collection $orders;
 
     public function __construct()
@@ -35,19 +24,14 @@ class Status
         $this->orders = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getStaffNumber(): ?string
     {
-        return $this->id;
+        return $this->staffNumber;
     }
 
-    public function getName(): ?string
+    public function setStaffNumber(string $staffNumber): static
     {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
+        $this->staffNumber = $staffNumber;
 
         return $this;
     }
@@ -64,7 +48,7 @@ class Status
     {
         if (!$this->orders->contains($order)) {
             $this->orders->add($order);
-            $order->setStatus($this);
+            $order->setAffectedStaff($this);
         }
 
         return $this;
@@ -74,8 +58,8 @@ class Status
     {
         if ($this->orders->removeElement($order)) {
             // set the owning side to null (unless already changed)
-            if ($order->getStatus() === $this) {
-                $order->setStatus(null);
+            if ($order->getAffectedStaff() === $this) {
+                $order->setAffectedStaff(null);
             }
         }
 
