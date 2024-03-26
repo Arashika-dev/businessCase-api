@@ -19,28 +19,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ApiResource(
-    collectionOperations: [
-        'get' => [
-            'access_control' => "is_granted('ROLE_ADMIN')"
-        ],
-        'post'
-    ],
-    itemOperations: [
-        'get' => [
-            'access_control' => "is_granted('VIEW', object) or object == user"
-        ],
-        'put' => [
-            'access_control' => "is_granted('EDIT', object) or object == user"
-        ],
-        'patch' => [
-            'access_control' => "is_granted('EDIT', object) or object == user"
-        ],
-        'delete' => [
-            'access_control' => "is_granted('ROLE_ADMIN')"
-        ]
-    ]
-)]
+#[ApiResource(security: "is_granted('ROLE_USER')")]
+#[GetCollection(security: "is_granted('ROLE_ADMIN')")]
+#[Post]
+#[Get(security: "is_granted('VIEW', object) or object.owner == user")]
+#[Patch(security: "is_granted('EDIT', object) or object.owner == user")]
+#[Delete(security: "is_granted('ROLE_ADMIN')")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
