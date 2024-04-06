@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -11,19 +9,23 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Doctrine\ORM\Mapping\DiscriminatorMap;
+use Doctrine\ORM\Mapping\InheritanceType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[InheritanceType('JOINED')]
+#[DiscriminatorColumn(name: 'discr', type: 'string')]
+#[DiscriminatorMap(['user' => User::class, 'staff' => Staff::class, 'customer' => Customer::class])]
 #[ORM\Table(name: '`user`')]
-#[ApiResource(security: "is_granted('ROLE_USER')")]
+#[ApiResource]
 #[GetCollection(security: "is_granted('ROLE_ADMIN')")]
 #[Post]
-#[Get(security: "is_granted('VIEW', object) or object.owner == user")]
-#[Patch(security: "is_granted('EDIT', object) or object.owner == user")]
+#[Get(security: "is_granted('VIEW', object) or object == user")]
+#[Patch(security: "is_granted('EDIT', object) or object == user")]
 #[Delete(security: "is_granted('ROLE_ADMIN')")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {

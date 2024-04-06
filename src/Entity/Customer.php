@@ -45,6 +45,7 @@ class Customer extends User
     public function __construct()
     {
         $this->orders_customer = new ArrayCollection();
+        $this->date_creation = new \DateTimeImmutable();
     }
 
     public function getAdresse(): ?string
