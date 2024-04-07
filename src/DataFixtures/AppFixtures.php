@@ -2,9 +2,12 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Article;
+use App\Entity\Category;
 use App\Entity\City;
 use App\Entity\Country;
 use App\Entity\Customer;
+use App\Entity\Services;
 use App\Entity\Staff;
 use App\Entity\State;
 use App\Entity\Status;
@@ -68,7 +71,6 @@ class AppFixtures extends Fixture
         for ($i = 0; $i < 10; $i++) {
             $customer = new Customer;
             $city = $this->cityRepository->find($faker->numberBetween(1,30) );
-            var_dump($city);
             $customer
                 ->setFirstName($faker->firstName)
                 ->setLastName($faker->lastName)
@@ -98,8 +100,83 @@ class AppFixtures extends Fixture
             $manager->persist($state);
         }
 
+        $categoryArray = ['Chemises', 'Haut', 'Bas', 'Robes', 'Costumes', 'Manteaux', 'Cuir et peaux', 'Maison', 'Accessoires'];
+        foreach ($categoryArray as $value) {
+            $category = new Category;
+            $category
+                ->setName($value);
+            $manager->persist($category);
+        }
+        $manager->flush();
 
-        
+        $basArray = ['Pantalon', 'Short', 'Jupe', 'Legging', 'Jean', 'Jogging'];
+        $category = $manager->getRepository(Category::class)->findOneBy(['name' => 'Bas']);
+        foreach ($basArray as $value) {
+            $bas = new Category;
+            $bas
+                ->setName($value)
+                ->setParent($category);
+            $manager->persist($bas);
+        }
+
+        $hautArray = ['T-shirt', 'Chemise', 'Pull', 'Sweat', 'Gilet', 'Veste'];
+        $category = $manager->getRepository(Category::class)->findOneBy(['name' => 'Haut']);
+        foreach ($hautArray as $value) {
+            $haut = new Category;
+            $haut
+                ->setName($value)
+                ->setParent($category);
+            $manager->persist($haut);
+        }
+
+        $manager->flush();
+
+        $services = ['Repassage', 'Nettoyage à sec', 'Lavage', 'Pliage', 'Lavage et repassage', 'Lavage et pliage', 'Repassage et pliage', 'Lavage, repassage et pliage'];
+        foreach ($services as $value) {
+            $service = new Services;
+            $service
+                ->setName($value)
+                ->setPrice($faker->randomFloat(2, 5, 50))
+                ->setDescription($faker->text);
+            $manager->persist($service);
+        }
+
+        $articleChemiseArray = ['Chemise en lin', 'Chemise', 'Chemise en soie', 'Chemisier', 'Veste'];
+        $category = $manager->getRepository(Category::class)->findOneBy(['name' => 'Chemises']);
+        foreach ($articleChemiseArray as $value) {
+            $article = new Article;
+            $article
+                ->setName($value)
+                ->setPrice($faker->randomFloat(2, 5, 50))
+                ->setUrlImg($faker->imageUrl())
+                ->setCategory($category);
+            $manager->persist($article);
+        }
+
+        $shortArray = ['Short en jean', 'Short en lin', 'Short en coton', 'Short en soie', 'Short en laine', 'Short de sport'];
+        $category = $manager->getRepository(Category::class)->findOneBy(['name' => 'Short']);
+        foreach ($shortArray as $value) {
+            $short = new Article;
+            $short
+                ->setName($value)
+                ->setPrice($faker->randomFloat(2, 5, 50))
+                ->setUrlImg($faker->imageUrl())
+                ->setCategory($category);
+            $manager->persist($short);
+        }
+
+        $manteauArray = ['Veste/Manteau en fourrure', 'Manteau en cuir', 'Manteau en soie', 'Doudoune', 'Manteau en jean', 'Manteau imperméable'];
+        $category = $manager->getRepository(Category::class)->findOneBy(['name' => 'Manteaux']);
+        foreach ($manteauArray as $value) {
+            $manteau = new Article;
+            $manteau
+                ->setName($value)
+                ->setPrice($faker->randomFloat(2, 5, 50))
+                ->setUrlImg($faker->imageUrl())
+                ->setCategory($category);
+            $manager->persist($manteau);
+        }
+
 
 
         $manager->flush();
