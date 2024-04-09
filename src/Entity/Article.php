@@ -19,11 +19,11 @@ class Article
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('articles:read', 'category:read')]
+    #[Groups('articles:read', 'category:read', 'order:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('articles:read', 'category:read')]
+    #[Groups('articles:read', 'category:read', 'order:read')]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -40,7 +40,7 @@ class Article
     private ?Category $category = null;
 
     #[ORM\ManyToMany(targetEntity: Services::class)]
-    #[Groups('articles:read')]
+    #[Groups('articles:read','order:read')]
     private Collection $service;
 
     public function __construct()

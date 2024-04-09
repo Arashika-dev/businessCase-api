@@ -33,15 +33,15 @@ class Category
     private ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
-    #[Groups('articles:read','category:read')]
+    #[Groups(['articles:read','category:read'])]
     private ?self $parent = null;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
-    #[Groups('articles:read', 'category:read')]
+    #[Groups(['articles:read'])]
     private Collection $children;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Article::class)]
-    #[Groups('category:read')]
+    #[Groups(['category:read'])]
     private Collection $articles;
 
     public function __construct()

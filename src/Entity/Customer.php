@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -15,6 +16,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Context;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ApiResource]
@@ -22,24 +26,31 @@ class Customer extends User
 {
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read'])]
     private ?string $adresse = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?\DateTimeImmutable $date_creation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
     private ?bool $civility = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read'])]
     private ?string $society = null;
 
     #[ORM\Column(length: 15, nullable: true)]
+    #[Groups(['user:read'])]
     private ?string $phone_number = null;
 
-    #[ORM\ManyToOne(inversedBy: 'customers')]
+    #[ORM\ManyToOne(inversedBy: 'customers', cascade: ['persist'])]
+    #[Groups(['user:read'])]
     private ?City $city = null;
 
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Order::class)]
+    #[Groups(['user:read', 'order:read'])]
     private Collection $orders_customer;
 
     public function __construct()

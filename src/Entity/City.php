@@ -36,16 +36,16 @@ class City
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['city:item'])]
+    #[Groups(['city:item', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['city:item'])]
+    #[Groups(['city:item', 'user:read'])]
     private ?string $zipCode = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['city:item'])]
+    #[Groups(['city:item', 'user:read'])]
     private ?Country $country = null;
 
     #[ORM\OneToMany(mappedBy: 'city', targetEntity: Customer::class)]

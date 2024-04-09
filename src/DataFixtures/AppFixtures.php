@@ -7,9 +7,9 @@ use App\Entity\Category;
 use App\Entity\City;
 use App\Entity\Country;
 use App\Entity\Customer;
+use App\Entity\Order;
 use App\Entity\Services;
 use App\Entity\Staff;
-use App\Entity\State;
 use App\Entity\Status;
 use App\Entity\User;
 use App\Repository\CityRepository;
@@ -84,7 +84,7 @@ class AppFixtures extends Fixture
         }
       
 
-        $statusArray = ['En cours de traitement', 'En attente', 'Terminé'];
+        $statusArray = ['En cours de traitement', 'En attente de retrait', 'Terminé', 'En attente de dépot'];
         foreach ($statusArray as $value) {
             $status = new Status;
             $status
@@ -92,13 +92,6 @@ class AppFixtures extends Fixture
             $manager->persist($status);
         }
 
-        $stateArray = ['Neuf', 'Mauvais', 'Bon', 'Très bon','Très Mauvais'];
-        foreach ($stateArray as $value) {
-            $state = new State;
-            $state
-                ->setName($value);
-            $manager->persist($state);
-        }
 
         $categoryArray = ['Chemises', 'Haut', 'Bas', 'Robes', 'Costumes', 'Manteaux', 'Cuir et peaux', 'Maison', 'Accessoires'];
         foreach ($categoryArray as $value) {
@@ -136,7 +129,7 @@ class AppFixtures extends Fixture
             $service = new Services;
             $service
                 ->setName($value)
-                ->setPrice($faker->randomFloat(2, 5, 50))
+                ->setPrice($faker->randomFloat(2, 1, 5))
                 ->setDescription($faker->text);
             $manager->persist($service);
         }
@@ -152,6 +145,8 @@ class AppFixtures extends Fixture
                 ->setCategory($category);
             $manager->persist($article);
         }
+
+        
 
         $shortArray = ['Short en jean', 'Short en lin', 'Short en coton', 'Short en soie', 'Short en laine', 'Short de sport'];
         $category = $manager->getRepository(Category::class)->findOneBy(['name' => 'Short']);
@@ -180,5 +175,37 @@ class AppFixtures extends Fixture
 
 
         $manager->flush();
+
+        $addService = $manager->getRepository(Services::class)->findAll();
+        $addArticle = $manager->getRepository(Article::class)->findAll();
+        foreach ($addArticle as $article) {
+            foreach ($addService as $service) {
+                $article->addService($service);
+                $manager->persist($article);
+            }
+        }
+
+
+        $customer = $manager->getRepository(Customer::class)->findOneBy(['email' => 'customer3@test.com']);
+        for ($i = 0; $i < 8; $i++) {
+            $order = new Order;
+            $prices = [];
+            for ($j = 0; $j < 3; $j++) {
+                $article = $manager->getRepository(Article::class)->find($faker->numberBetween(1, 17));
+                $service = $article->getService();
+                $servicePrice = $service[$faker->numberBetween(0, 7)]->getPrice();
+                $prices[] = ($article->getPrice()* $servicePrice);
+                $order->addArticle($article);
+            }
+            $order
+                ->setCustomer($customer)
+                ->setStatus($manager->getRepository(Status::class)->find($faker->numberBetween(1, 4)))
+                ->setTotalPrice(array_sum($prices));
+            $manager->persist($order);
+
+        }
+
+        $manager->flush();
+
     }
 }

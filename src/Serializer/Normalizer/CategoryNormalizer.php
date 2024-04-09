@@ -21,9 +21,8 @@ class CategoryNormalizer implements NormalizerInterface, CacheableSupportsMethod
             return $data;
           }
 
-        if ($object->getParent()) {
-            $data['parent'] = $object->getParent()->getName();
-        }
+       
+        
 
         return $data;
     }

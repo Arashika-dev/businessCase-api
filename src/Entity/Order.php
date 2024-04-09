@@ -15,44 +15,55 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext:['groups' => ['order:read']]
+)]
 class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['order:read', 'user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['order:read', 'user:read'])]
     private ?\DateTimeImmutable $deposit_hour = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['order:read', 'user:read'])]
     private ?\DateTimeInterface $recuperation_hour = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders_customer')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:read'])]
     private ?Customer $customer = null;
 
     #[ORM\ManyToMany(targetEntity: article::class)]
+    #[Groups(['order:read'])]
     private Collection $article;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?State $state = null;
-
-    #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:read', 'user:read'])]
     private ?Status $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read'])]
     private ?Staff $affectedStaff = null;
+
+    #[ORM\Column]
+    #[Groups(['order:read', 'user:read'])]
+    private ?float $totalPrice = null;
 
     public function __construct()
     {
         $this->article = new ArrayCollection();
+        $this->deposit_hour = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -120,17 +131,6 @@ class Order
         return $this;
     }
 
-    public function getState(): ?State
-    {
-        return $this->state;
-    }
-
-    public function setState(?State $state): static
-    {
-        $this->state = $state;
-
-        return $this;
-    }
 
     public function getStatus(): ?Status
     {
@@ -152,6 +152,18 @@ class Order
     public function setAffectedStaff(?Staff $affectedStaff): static
     {
         $this->affectedStaff = $affectedStaff;
+
+        return $this;
+    }
+
+    public function getTotalPrice(): ?float
+    {
+        return $this->totalPrice;
+    }
+
+    public function setTotalPrice(float $totalPrice): static
+    {
+        $this->totalPrice = $totalPrice;
 
         return $this;
     }

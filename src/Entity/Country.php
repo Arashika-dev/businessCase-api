@@ -39,12 +39,12 @@ class Country
     private ?int $id = null;
 
     #[ORM\Column(length:3, unique:true)]
-    #[Groups(['country:item'],['city:item'])]
+    #[Groups(['country:item','city:item', 'user:read'])]
     private ?string $code = null;
 
 
     #[ORM\Column(length: 255, unique:true)]
-    #[Groups(['country:item'],['city:item'])]
+    #[Groups(['country:item','city:item', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'country', targetEntity: City::class, orphanRemoval: true)]
